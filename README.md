@@ -5,7 +5,7 @@ A demonstration of EIP-7702 implementation using Hardhat. This project showcases
 ## Key Features
 
 - Batch execution of multiple transactions
-- EIP-7702 compliant signatures and authorization
+- EIP-7702 compliant signatures and authorization (using type 0x04 transactions)
 - Support for ETH transfers and contract calls
 - RLP encoding for transaction data
 
@@ -17,7 +17,7 @@ A demonstration of EIP-7702 implementation using Hardhat. This project showcases
 - Emits events for execution results
 - Implements batch delegation pattern
 
-## Development Setup
+## Development Setup and Execution Steps
 
 This project is configured to run on the Mekong testnet. To get started:
 
@@ -28,10 +28,16 @@ npm install
 # Configure .env file
 PRIVATE_KEY="your_private_key"
 RPC_URL="https://rpc.mekong.ethpandaops.io"
+RECIPIENT_ADDRESS="your_recipient_address"
 
-# Deploy and execute contract
+# Step 1: Deploy the contract
+npx hardhat run scripts/deployBatchCallDelegation.js --network mekong
+
+# Step 2: Execute batch calls
 npx hardhat run scripts/executeBatchCallDelegation.js --network mekong
 ```
+
+During deployment, a `deployments/{network}.json` file will be created containing the deployed contract address and related information. The execution script then uses this deployment information to perform the batch calls.
 
 ## Testnet Information
 

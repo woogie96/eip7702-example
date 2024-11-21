@@ -1,20 +1,20 @@
 const { ethers } = require('hardhat');
+const fs = require('fs');
+const path = require('path');
 
 const main = async () => {
-  // Initialize wallet instance with private key and provider
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, ethers.provider);
 
-  // Get contract factory for BatchCallDelegation smart contract
-  const BatchCallDelegation = await ethers.getContractFactory("BatchCallDelegation", wallet);
+  // Read deployment info from JSON file
+  const deploymentPath = path.join(__dirname, '../deployments', `${network.name}.json`);
+  if (!fs.existsSync(deploymentPath)) {
+    throw new Error(`Deployment file not found for network: ${network.name}`);
+  }
   
-  // Deploy BatchCallDelegation contract
-  console.log("Deploying BatchCallDelegation contract...");
-  const batchCallDelegation = await BatchCallDelegation.deploy();
+  const deploymentInfo = JSON.parse(fs.readFileSync(deploymentPath, 'utf8'));
+  const BATCH_CALL_DELEGATION_ADDRESS = deploymentInfo.contractAddress;
   
-  // Wait until the contract is fully deployed on the blockchain
-  await batchCallDelegation.waitForDeployment();
-  
-  console.log("BatchCallDelegation deployed to:", batchCallDelegation.target);
+  console.log(`Using BatchCallDelegation at: ${BATCH_CALL_DELEGATION_ADDRESS}`);
 
   // Define contract interface with execute function signature
   const batchInterface = new ethers.Interface([
@@ -24,23 +24,21 @@ const main = async () => {
   // Define sample transaction parameters for batch execution
   const calls = [
     {
-      data: "0x", // Empty calldata for simple ETH transfer
-      to: "0xf19588Ce7eF802F26bf7a7d9d96444dD4Ed8DA59", // Recipient address
-      value: ethers.parseEther("0.001") // Amount of ETH to transfer (0.001 ETH)
+      data: "0x",
+      to: process.env.RECIPIENT_ADDRESS,
+      value: ethers.parseEther("0.001")
     }
   ];
 
   // Encode the execute function call with parameters
   const calldata = batchInterface.encodeFunctionData("execute", [calls]);
 
-  // Get current nonce for the wallet address
   const currentNonce = await ethers.provider.getTransactionCount(wallet.address);
 
-  // Prepare authorization data for the transaction
   const authorizationData = {
-    chainId: '0x01a5ee289c', // Mekong testnet chain ID
-    address: batchCallDelegation.target, // Deployed contract address
-    nonce: ethers.toBeHex(currentNonce + 1), // Next nonce in hex format
+    chainId: '0x01a5ee289c',
+    address: BATCH_CALL_DELEGATION_ADDRESS,
+    nonce: ethers.toBeHex(currentNonce + 1),
   }
 
   // Encode authorization data according to EIP-712 standard
@@ -115,9 +113,8 @@ const main = async () => {
   console.log('tx sent: ', tx);
 }
 
-// Execute main function and handle success/error cases
 main().then(() => {
-  console.log('done');
+  console.log('Execution completed');
   process.exit(0);
 }).catch((error) => {
   console.error(error);
