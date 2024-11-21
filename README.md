@@ -59,3 +59,8 @@ The contract allows multiple calls to be executed in a single transaction, with 
 
 ---
 Reference: [Viem EIP-7702 Documentation](https://viem.sh/experimental/eip7702)
+
+## Coworkers
+
+- [@Miller-kk](https://github.com/Miller-kk) - Account Abstraction pioneer
+- [@shamshod01](https://github.com/shamshod01) - Blockchain & AI Enthusiast
