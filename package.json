@@ -1,0 +1,9 @@
+{
+  "name": "eip7702-batchcalldelegation-example",
+  "dependencies": {
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.16"
+  }
+}
