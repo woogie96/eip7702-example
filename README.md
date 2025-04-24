@@ -58,7 +58,9 @@ struct Call {
 The contract allows multiple calls to be executed in a single transaction, with proper authorization and signature verification according to EIP-7702 standards.
 
 ---
-Reference: [Viem EIP-7702 Documentation](https://viem.sh/experimental/eip7702)
+Reference: 
+- [Viem EIP-7702 Documentation](https://viem.sh/experimental/eip7702)
+- [EIP-7702 Official Documentation](https://eips.ethereum.org/EIPS/eip-7702)
 
 ## Coworkers
 
