@@ -19,7 +19,7 @@ A demonstration of EIP-7702 implementation using Hardhat. This project showcases
 
 ## Development Setup and Execution Steps
 
-This project is configured to run on the Mekong testnet. To get started:
+This project is configured to run on the Sepolia testnet. To get started:
 
 ```shell
 # Install dependencies
@@ -27,23 +27,23 @@ npm install
 
 # Configure .env file
 PRIVATE_KEY="your_private_key"
-RPC_URL="https://rpc.mekong.ethpandaops.io"
+RPC_URL="https://sepolia.infura.io/v3/YOUR-PROJECT-ID"
 RECIPIENT_ADDRESS="your_recipient_address"
 
 # Step 1: Deploy the contract
-npx hardhat run scripts/deployBatchCallDelegation.js --network mekong
+npx hardhat run scripts/deployBatchCallDelegation.js --network sepolia
 
 # Step 2: Execute batch calls
-npx hardhat run scripts/executeBatchCallDelegation.js --network mekong
+npx hardhat run scripts/executeBatchCallDelegation.js --network sepolia
 ```
 
 During deployment, a `deployments/{network}.json` file will be created containing the deployed contract address and related information. The execution script then uses this deployment information to perform the batch calls.
 
 ## Testnet Information
 
-This project is tested on Mekong testnet:
-- Chain ID: 0x01a5ee289c
-- RPC URL: https://rpc.mekong.ethpandaops.io
+This project is tested on Sepolia testnet:
+- Chain ID: 11155111
+- RPC URL: https://sepolia.infura.io/v3/YOUR-PROJECT-ID
 
 ## Contract Structure
 
