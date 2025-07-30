@@ -9,6 +9,10 @@ contract BatchCallDelegation {
         uint256 value;
     }
 
+    receive() external payable {}
+
+    fallback() external payable {}
+
     function execute(Call[] calldata calls) external payable {
         for (uint256 i = 0; i < calls.length; i++) {
             Call memory call = calls[i];
