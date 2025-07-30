@@ -108,9 +108,23 @@ const main = async () => {
   ]));
 
   // Send the raw transaction to the network
-  const tx = await ethers.provider.send('eth_sendRawTransaction', [signedTx]);
+  const txHash = await ethers.provider.send('eth_sendRawTransaction', [signedTx]);
   
-  console.log('tx sent: ', tx);
+  console.log('tx sent: ', txHash);
+
+  // Wait for transaction using polling
+  console.log('Waiting for transaction to be mined...');
+
+  let receipt = null;
+  while (!receipt) {
+    receipt = await ethers.provider.getTransactionReceipt(txHash);
+    if (!receipt) {
+      await new Promise(resolve => setTimeout(resolve, 15000)); // sepolia's average block time is 12~15 seconds
+    }
+  }
+  console.log('tx is mined: ', receipt.hash);
+
+  console.log(`EOA account's code: ${await ethers.provider.getCode(wallet.address)}`);
 }
 
 main().then(() => {
