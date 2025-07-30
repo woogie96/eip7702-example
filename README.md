@@ -8,6 +8,8 @@ A demonstration of EIP-7702 implementation using Hardhat. This project showcases
 - EIP-7702 compliant signatures and authorization (using type 0x04 transactions)
 - Support for ETH transfers and contract calls
 - RLP encoding for transaction data
+- Temporary account code delegation
+- Secure signature verification
 
 ## Smart Contract
 
@@ -35,6 +37,9 @@ npx hardhat run scripts/deployBatchCallDelegation.js --network sepolia
 
 # Step 2: Execute batch calls
 npx hardhat run scripts/executeBatchCallDelegation.js --network sepolia
+
+# Step 3: Remove account code (optional)
+npx hardhat run scripts/executeRemoveAccountCode.js --network sepolia
 ```
 
 During deployment, a `deployments/{network}.json` file will be created containing the deployed contract address and related information. The execution script then uses this deployment information to perform the batch calls.
@@ -154,11 +159,6 @@ The contract allows multiple calls to be executed in a single transaction, with 
 - **Batch Operations**: Execute multiple operations in a single transaction
 - **Signature Validation**: Secure authorization through EIP-7702 compliant signatures
 
----
-Reference: 
-- [Viem EIP-7702 Documentation](https://viem.sh/experimental/eip7702)
-- [EIP-7702 Official Documentation](https://eips.ethereum.org/EIPS/eip-7702)
-
 ## Benefits of EIP-7702
 
 EIP-7702 brings several significant improvements to Ethereum's account abstraction capabilities:
@@ -186,12 +186,55 @@ EIP-7702 brings several significant improvements to Ethereum's account abstracti
 - **Future-Proof**: Designed for compatibility with future account abstraction improvements
 - **Storage Management**: Flexible storage layout options for delegate contracts
 
----
-Reference: 
+## Scripts Overview
+
+### 1. `deployBatchCallDelegation.js`
+Deploys the BatchCallDelegation contract to the specified network and saves deployment information.
+
+### 2. `executeBatchCallDelegation.js`
+Executes batch calls using EIP-7702 delegation:
+- Creates authorization data with proper chain ID and nonce
+- Signs authorization data according to EIP-7702 standards
+- Constructs type 0x04 transaction with RLP encoding
+- Sends raw transaction to the network
+
+### 3. `executeRemoveAccountCode.js`
+Removes delegated account code:
+- Sets delegate address to zero address
+- Removes temporary code delegation
+- Returns EOA to its original state
+
+## Technical Implementation Details
+
+### Transaction Type 0x04
+EIP-7702 uses transaction type 0x04 which includes:
+- Authorization data in the access list
+- RLP-encoded transaction parameters
+- Signature verification for delegation
+
+### Authorization Process
+1. Create authorization data with chain ID, delegate address, and nonce
+2. Encode with magic byte 0x05 and RLP encoding
+3. Sign the authorization data hash
+4. Include signature components in transaction access list
+
+### Code Delegation
+- Temporary delegation of smart contract code to EOA
+- Code is stored at delegate contract address
+- EOA can execute delegated code during transaction
+- Code is automatically removed after transaction completion
+
+## References
+
 - [Viem EIP-7702 Documentation](https://viem.sh/experimental/eip7702)
 - [EIP-7702 Official Documentation](https://eips.ethereum.org/EIPS/eip-7702)
+- [Account Abstraction Overview](https://ethereum.org/en/roadmap/account-abstraction/)
 
-## Coworkers
+## Contributors
 
 - [@Miller-kk](https://github.com/Miller-kk) - Account Abstraction pioneer
 - [@shamshod01](https://github.com/shamshod01) - Blockchain & AI Enthusiast
+
+## License
+
+This project is licensed under the MIT License.
