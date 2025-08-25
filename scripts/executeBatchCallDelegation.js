@@ -34,9 +34,10 @@ const main = async () => {
   const calldata = batchInterface.encodeFunctionData("execute", [calls]);
 
   const currentNonce = await ethers.provider.getTransactionCount(wallet.address);
+  const chainId = await ethers.provider.getNetwork().then(network => network.chainId);
 
   const authorizationData = {
-    chainId: '0xaa36a7',
+    chainId: ethers.toBeHex(chainId),
     address: BATCH_CALL_DELEGATION_ADDRESS,
     nonce: ethers.toBeHex(currentNonce + 1),
   }
@@ -63,13 +64,16 @@ const main = async () => {
   // Get current gas fee data from the network
   const feeData = await ethers.provider.getFeeData();
 
+  let maxPriorityFeePerGas = ethers.toBeHex(feeData.maxPriorityFeePerGas);
+  maxPriorityFeePerGas = maxPriorityFeePerGas === '0x00'? '0x' : maxPriorityFeePerGas;
+
   // Prepare complete transaction data structure
   const txData = [
     authorizationData.chainId,
     ethers.toBeHex(currentNonce),
-    ethers.toBeHex(feeData.maxPriorityFeePerGas), // Priority fee (tip)
+    maxPriorityFeePerGas, // Priority fee (tip)
     ethers.toBeHex(feeData.maxFeePerGas), // Maximum total fee willing to pay
-    ethers.toBeHex(1000000), // Gas limit
+    ethers.toBeHex(10000000), // Gas limit (example: 1000000)
     wallet.address, // Sender address
     '0x', // Value (in addition to batch transfers)
     calldata, // Encoded function call
@@ -119,7 +123,7 @@ const main = async () => {
   while (!receipt) {
     receipt = await ethers.provider.getTransactionReceipt(txHash);
     if (!receipt) {
-      await new Promise(resolve => setTimeout(resolve, 15000)); // sepolia's average block time is 12~15 seconds
+      await new Promise(resolve => setTimeout(resolve, 15000));
     }
   }
   console.log('tx is mined: ', receipt.hash);

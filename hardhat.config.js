@@ -11,8 +11,8 @@ module.exports = {
     }
   },
   networks: {
-    sepolia: {
+    target: {
       url: process.env.RPC_URL
-    },
+    }
   },
 };

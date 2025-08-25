@@ -8,7 +8,7 @@ A demonstration of EIP-7702 implementation using Hardhat. This project showcases
 - EIP-7702 compliant signatures and authorization (using type 0x04 transactions)
 - Support for ETH transfers and contract calls
 - RLP encoding for transaction data
-- Temporary account code delegation
+- Permanent account code delegation
 - Secure signature verification
 
 ## Smart Contract
@@ -21,7 +21,7 @@ A demonstration of EIP-7702 implementation using Hardhat. This project showcases
 
 ## Development Setup and Execution Steps
 
-This project is configured to run on the Sepolia testnet. To get started:
+This project supports multiple networks and is configured to work with any EVM-compatible blockchain that supports EIP-7702, including Substrate-based chains with EVM compatibility. The recent network configuration changes were specifically implemented to support Substrate-based blockchains. To get started:
 
 ```shell
 # Install dependencies
@@ -29,26 +29,65 @@ npm install
 
 # Configure .env file
 PRIVATE_KEY="your_private_key"
-RPC_URL="https://sepolia.infura.io/v3/YOUR-PROJECT-ID"
+RPC_URL="your_rpc_url"
 RECIPIENT_ADDRESS="your_recipient_address"
 
 # Step 1: Deploy the contract
-npx hardhat run scripts/deployBatchCallDelegation.js --network sepolia
+npx hardhat run scripts/deployBatchCallDelegation.js --network target
 
 # Step 2: Execute batch calls
-npx hardhat run scripts/executeBatchCallDelegation.js --network sepolia
+npx hardhat run scripts/executeBatchCallDelegation.js --network target
 
 # Step 3: Remove account code (optional)
-npx hardhat run scripts/executeRemoveAccountCode.js --network sepolia
+npx hardhat run scripts/executeRemoveAccountCode.js --network target
 ```
 
 During deployment, a `deployments/{network}.json` file will be created containing the deployed contract address and related information. The execution script then uses this deployment information to perform the batch calls.
 
-## Testnet Information
+## Supported Networks
 
-This project is tested on Sepolia testnet:
-- Chain ID: 11155111
-- RPC URL: https://sepolia.infura.io/v3/YOUR-PROJECT-ID
+This project can be deployed and executed on any EVM-compatible network that supports EIP-7702, including Substrate-based chains with EVM compatibility. The flexible network configuration allows seamless integration with various blockchain ecosystems.
+
+## Network Configuration
+
+The project uses a flexible network configuration in `hardhat.config.js` that was specifically designed to support Substrate-based chains:
+
+```javascript
+networks: {
+  target: {
+    url: process.env.RPC_URL
+  }
+}
+```
+
+This configuration allows you to easily switch between different networks, including Substrate-based chains, by simply changing the `RPC_URL` in your `.env` file. The deployment and execution scripts automatically detect the network and save/load deployment information accordingly.
+
+### Substrate Chain Support
+
+The recent network configuration changes were implemented to provide seamless support for Substrate-based blockchains with EVM compatibility. The flexible RPC configuration ensures that the same deployment and execution scripts work across all supported networks without modification.
+
+## Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```env
+# Your wallet private key (without 0x prefix)
+PRIVATE_KEY=your_private_key_here
+
+# RPC URL for your target network
+RPC_URL=https://your-network-rpc-url
+
+# Recipient address for test transactions
+RECIPIENT_ADDRESS=0x...
+```
+
+**Important Notes:**
+- Never commit your `.env` file to version control
+- Ensure your target network supports EIP-7702 before deployment
+- Test on testnets first before deploying to mainnet
+- Make sure you have sufficient native tokens for gas fees
+- For Substrate-based chains, verify EVM compatibility and EIP-7702 support
+- Some Substrate chains may have different gas fee structures or transaction formats
 
 ## Contract Structure
 
@@ -152,7 +191,7 @@ The contract allows multiple calls to be executed in a single transaction, with 
 
 ### Key Features
 
-- **Temporary Delegation**: EOA can temporarily behave like a smart contract
+- **Permanent Delegation**: EOA can permanently behave like a smart contract
 - **Permission Verification**: Secure delegation through signatures and nonce checks
 - **Flexible Execution**: Ability to perform various operations in delegated code
 - **Gas Efficiency**: More efficient gas usage compared to traditional EOA operations
@@ -190,6 +229,9 @@ EIP-7702 brings several significant improvements to Ethereum's account abstracti
 
 ### 1. `deployBatchCallDelegation.js`
 Deploys the BatchCallDelegation contract to the specified network and saves deployment information.
+- Automatically detects the current network from the RPC URL
+- Creates network-specific deployment files in `deployments/{network}.json`
+- Supports any EVM-compatible network with EIP-7702 support
 
 ### 2. `executeBatchCallDelegation.js`
 Executes batch calls using EIP-7702 delegation:
@@ -197,12 +239,23 @@ Executes batch calls using EIP-7702 delegation:
 - Signs authorization data according to EIP-7702 standards
 - Constructs type 0x04 transaction with RLP encoding
 - Sends raw transaction to the network
+- Automatically loads deployment information for the current network
 
 ### 3. `executeRemoveAccountCode.js`
 Removes delegated account code:
 - Sets delegate address to zero address
-- Removes temporary code delegation
+- Removes permanent code delegation
 - Returns EOA to its original state
+- Works across all supported networks
+
+## Network-Specific Features
+
+- **Automatic Network Detection**: Scripts automatically detect the network from the RPC URL
+- **Network-Specific Deployment Files**: Each network gets its own deployment file for isolation
+- **Cross-Network Compatibility**: Same scripts work across different networks without modification
+- **Flexible RPC Configuration**: Easy switching between networks via environment variables
+- **Substrate Chain Support**: Native support for Substrate-based chains with EVM compatibility
+- **Multi-Ecosystem Integration**: Seamless deployment across Ethereum, Polygon, and Substrate ecosystems
 
 ## Technical Implementation Details
 
@@ -219,10 +272,10 @@ EIP-7702 uses transaction type 0x04 which includes:
 4. Include signature components in transaction access list
 
 ### Code Delegation
-- Temporary delegation of smart contract code to EOA
+- Permanent delegation of smart contract code to EOA
 - Code is stored at delegate contract address
 - EOA can execute delegated code during transaction
-- Code is automatically removed after transaction completion
+- Code remains active until explicitly removed
 
 ## References
 
