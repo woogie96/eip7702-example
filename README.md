@@ -1,5 +1,7 @@
 # EIP-7702 Batch Call Delegation Example
 
+> ⚠️ **WARNING: This project is for educational and demonstration purposes only. Do NOT use in production environments. The contract and scripts have not been audited and may contain security vulnerabilities.**
+
 A demonstration of EIP-7702 implementation using Hardhat. This project showcases how to implement batch call delegation with EIP-7702 signature validation.
 
 ## Key Features
